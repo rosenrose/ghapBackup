@@ -6,8 +6,6 @@ from selenium import webdriver
 
 url = "https://ghaptouhou.tistory.com"
 path = "D:/Touhou/ghap"
-html_header = "<html><head><title>%s</title></head><body><br><h1>%s</h1><br>" %(title, title)
-html_footer = "</body></html>"
 driver = webdriver.Chrome("D:\\Install\\chromedriver")
 driver.implicitly_wait(5)
 
@@ -22,7 +20,9 @@ for code in range(9, 11):
 	if(catRegex.match(category)):
 		title = tdiv.find('h2').find('a').text
 		date = tdiv.find_all('span')[1].text
-
+		html_header = "<html><head><title>%s</title></head><body><br><h1>%s</h1><br>" %(title, title)
+		html_footer = "</body></html>"
+		
 		if not os.path.isdir("%s/%s_%d" %(path, title, code)):
 			os.mkdir("%s/%s_%d" %(path, title, code))
 
