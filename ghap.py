@@ -27,7 +27,7 @@ def replaceSpecialCh(title):
 	res = res.replace('|','｜')
 	return res
 
-for code in range(287, 301):
+for code in range(1, 101):
 	print("%d start" %(code))
 	driver.get("%s/%d" %(url, code))
 	soup = BeautifulSoup(driver.page_source, 'html.parser')
