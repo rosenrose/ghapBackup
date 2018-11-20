@@ -27,7 +27,7 @@ def replaceSpecialCh(title):
 	res = res.replace('|','｜')
 	return res
 
-for code in range(1, 101):
+for code in range(287, 301):
 	print("%d start" %(code))
 	driver.get("%s/%d" %(url, code))
 	soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -61,7 +61,7 @@ for code in range(1, 101):
 	for i in p:
 		if i.find('span',{'class':'imageblock'}) is not None:
 			fileName = i.find('img')['filename']
-			urllib.request.urlretrieve(i.find('img')['src'], '%s/%s' %(doc, fileName))
+			urllib.request.urlretrieve(i.find('img')['src'], "%s/%s" %(doc, fileName))
 			pos1 = str(i).find("<span class=\"imageblock\"")
 			pos2 = str(i).find("</p>", pos1)
 			f.write(str(i)[:pos1]+"<img src=\"%d_%s/%s\"></p><br>" %(code, titleWin, fileName)+str(i)[pos2:])
