@@ -8,7 +8,6 @@ url = "https://ghaptouhou.tistory.com"
 path = "D:/Touhou/ghap"
 logfile = "log.log"
 driver = webdriver.Chrome("D:/Install/chromedriver")
-driver.implicitly_wait(5)
 html_footer = "</body></html>"
 
 def writeLog(msg):
@@ -61,7 +60,8 @@ for code in range(1, 101):
 	for i in p:
 		if i.find('span',{'class':'imageblock'}) is not None:
 			fileName = i.find('img')['filename']
-			urllib.request.urlretrieve(i.find('img')['src'], "%s/%s" %(doc, fileName))
+			imgSrc = i.find('img')['src']+"?original"
+			urllib.request.urlretrieve(imgSrc, "%s/%s" %(doc, fileName))
 			pos1 = str(i).find("<span class=\"imageblock\"")
 			pos2 = str(i).find("</p>", pos1)
 			f.write(str(i)[:pos1]+"<img src=\"%d_%s/%s\"></p><br>" %(code, titleWin, fileName)+str(i)[pos2:])
