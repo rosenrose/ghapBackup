@@ -76,10 +76,12 @@ def ghap(codeList):
 			continue
 		html_header = "<html><head><title>%s</title></head><body><br><h2>%s</h2><br>" %(title, title)
 		f.write(html_header)
-		f.write("%s<br>%s<br>" %(category, date))
+		f.write("<div class=\"category\">%s</div><br>" %(category))
+		f.write("<div class=\"date\">%s</div><br>" %(date))
 
 		article = soup.find('div', { 'class': 'article' })
 		p = article.find_all('p')
+		f.write("<div class=\"article\">")
 		for i in p:
 			if i.find('span',{'class':'imageblock'}) is not None:
 				fileName = i.find('img')['filename']
@@ -88,13 +90,13 @@ def ghap(codeList):
 				try:
 					imgBuf = imgBuf.read()
 				except:
-					writeLog("%d_%s/%s reading fail\n" %(cod,titleWin,fileName))
+					writeLog("%d_%s/%s reading fail\n" %(code,titleWin,fileName))
 					continue
 
 				try:
 					imgFile = open("%s_%s/%s" %(doc,titleWin,fileName), "wb")
 				except:
-					writeLog("Making %d_%s/%s fail\n" %(code,titleWin,fileName))
+					writeLog("Making %d_%s/%s fail\n" %(cod,titleWin,fileName))
 					continue
 				else:
 					imgFile.write(imgBuf)
@@ -105,23 +107,26 @@ def ghap(codeList):
 				f.write(str(i)[:pos1]+"<img src=\"%d_%s/%s\"></p><br>" %(code, titleWin, fileName)+str(i)[pos2:])
 			else:
 				f.write(str(i))
-	    			
+		f.write("</div><br>")
+
 		tag = soup.find('div', { 'class': 'tagTrail' })
+		f.write("<div class=\"tagTrail\">")
 		if tag is not None:
 			tag = tag.find_all('a')[1:]
-			f.write("<br><p>태그: </p><ul>")
+			f.write("<p>태그: </p><ul>")
 			for i in tag:
 				f.write("<li>%s</li>"%(i.text))
-			f.write("</ul><br>")
+			f.write("</ul></div><br>")
 
 		another = soup.find('div', { 'class': 'another_category another_category_color_gray' }).find('table').find_all('a')
+		f.write("<div class=\"another\">")
 		f.write("<p>'%s' 카테고리의 다른 글</p><ul>" %(category))
 		codeRegex = re.compile('[0-9]*')
 		for i in another:
 			anotherTitle = i.text
 			anotherCode = codeRegex.findall(i['href'])[1]
 			f.write("<li><a href=\"%s.html\">%s</a></li>" %(anotherCode, anotherTitle))
-		f.write("</ul><br>")
+		f.write("</ul></div><br>")
 
 		comment = str(soup.find('div', { 'class': 'cb_module cb_fluid' }))
 		while(comment.find("<a href=\"/toolbar") != -1):
@@ -138,4 +143,4 @@ def ghap(codeList):
 		print("%d end" %(code))
 	driver.quit()
 
-ghap(range(1, 100))
+ghap(range(1701,2001))
