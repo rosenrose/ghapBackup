@@ -32,8 +32,8 @@ def replaceSpecialCh(title):
 	res = res.replace('.','．')
 	return res
 
-def ghap(start, end):
-	for code in range(start, end):
+def ghap(codeList):
+	for code in codeList:
 		print("%d start" %(code))
 		driver.get("%s/%d" %(url, code))
 		current_code = driver.current_url.split('/')
@@ -138,4 +138,4 @@ def ghap(start, end):
 		print("%d end" %(code))
 	driver.quit()
 
-ghap(1, 100)
+ghap(range(1, 100))
