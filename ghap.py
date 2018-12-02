@@ -66,6 +66,7 @@ def ghap(start, end):
 				os.mkdir("%s_%s" %(doc,titleWin))
 			except:
 				writeLog("Making \'%s_%s\' folder fail\n" %(doc,titleWin))
+				continue
 
 		try:
 			f = open(doc+".html", "w", encoding="utf-8-sig")
@@ -93,7 +94,7 @@ def ghap(start, end):
 				try:
 					imgFile = open("%s_%s/%s" %(doc,titleWin,fileName), "wb")
 				except:
-					writeLog("Making %d_%s/%s fail\n" %(cod,titleWin,fileName))
+					writeLog("Making %d_%s/%s fail\n" %(code,titleWin,fileName))
 					continue
 				else:
 					imgFile.write(imgBuf)
@@ -135,7 +136,6 @@ def ghap(start, end):
 		f.write(html_footer)
 		f.close()
 		print("%d end" %(code))
-
 	driver.quit()
 
 ghap(1, 100)
