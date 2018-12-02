@@ -96,7 +96,7 @@ def ghap(codeList):
 				try:
 					imgFile = open("%s_%s/%s" %(doc,titleWin,fileName), "wb")
 				except:
-					writeLog("Making %d_%s/%s fail\n" %(cod,titleWin,fileName))
+					writeLog("Making %d_%s/%s fail\n" %(code,titleWin,fileName))
 					continue
 				else:
 					imgFile.write(imgBuf)
@@ -104,7 +104,7 @@ def ghap(codeList):
 					imgFile.close()
 				pos1 = str(i).find("<span class=\"imageblock\"")
 				pos2 = str(i).find("</p>", pos1)
-				f.write(str(i)[:pos1]+"<img src=\"%d_%s/%s\"></p><br>" %(code, titleWin, fileName)+str(i)[pos2:])
+				f.write(str(i)[:pos1]+"<img src=\"%d_%s/%s\"></p><br>" %(code,titleWin,fileName)+str(i)[pos2:])
 			else:
 				f.write(str(i))
 		f.write("</div><br>")
@@ -125,7 +125,7 @@ def ghap(codeList):
 		for i in another:
 			anotherTitle = i.text
 			anotherCode = codeRegex.findall(i['href'])[1]
-			f.write("<li><a href=\"%s.html\">%s</a></li>" %(anotherCode, anotherTitle))
+			f.write("<li><a href=\"%s.html\">%s</a></li>" %(anotherCode,anotherTitle))
 		f.write("</ul></div><br>")
 
 		comment = str(soup.find('div', { 'class': 'cb_module cb_fluid' }))
