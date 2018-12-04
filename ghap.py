@@ -83,7 +83,7 @@ def ghap(codeList):
 		p = article.find_all('p')
 		f.write("<div class=\"article\">")
 		for i in p:
-			if i.find('span',{'class':'imageblock'}) is not None:
+			if i.find('img') is not None and str(i.find('img')).find('filename')!=-1:
 				fileName = i.find('img')['filename']
 				imgSrc = i.find('img')['src']+"?original"
 				imgBuf = urllib.request.urlopen(imgSrc)
@@ -125,7 +125,7 @@ def ghap(codeList):
 		for i in another:
 			anotherTitle = i.text
 			anotherCode = codeRegex.findall(i['href'])[1]
-			f.write("<li><a href=\"%s.html\">%s</a></li>" %(anotherCode,anotherTitle))
+			f.write("<li><a href=\"%s.html\">%s</a></li>" %(anotherCode, anotherTitle))
 		f.write("</ul></div><br>")
 
 		comment = str(soup.find('div', { 'class': 'cb_module cb_fluid' }))
@@ -143,4 +143,4 @@ def ghap(codeList):
 		print("%d end" %(code))
 	driver.quit()
 
-ghap(range(1701,2001))
+ghap(range(1,5001))
