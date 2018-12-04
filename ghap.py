@@ -36,13 +36,7 @@ def ghap(codeList):
 	for code in codeList:
 		print("%d start" %(code))
 		driver.get("%s/%d" %(url, code))
-		current_code = driver.current_url.split('/')
-		current_code = current_code[len(current_code)-1]
-		try:
-			element = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"imageblock")))
-		except:
-			writeLog("%d has no images\n" %(code))
-			continue
+		current_code = driver.current_url.split('/')[-1]
 
 		soup = BeautifulSoup(driver.page_source, 'html.parser')
 		tdiv = soup.find('div', { 'class': 'tdiv' })
@@ -54,6 +48,12 @@ def ghap(codeList):
 		catRegex = re.compile('(동방 동인지|합동인지|동방 웹코믹|세로 식질 유배소)')
 		if not (catRegex.match(category)):
 			writeLog("%d out of category (%s)\n" %(code, category))
+			continue
+
+		try:
+			element = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"imageblock")))
+		except:
+			writeLog("%d has no image\n" %(code))
 			continue
 
 		title = tdiv.find('h2').find('a').text
@@ -74,6 +74,7 @@ def ghap(codeList):
 			writeLog("Making \'%s\' file fail\n" %(title))
 			f.close()
 			continue
+			
 		html_header = "<html><head><title>%s</title></head><body><br><h2>%s</h2><br>" %(title, title)
 		f.write(html_header)
 		f.write("<div class=\"category\">%s</div><br>" %(category))
@@ -84,7 +85,8 @@ def ghap(codeList):
 		f.write("<div class=\"article\">")
 		for i in p:
 			if i.find('img') is not None and str(i.find('img')).find('filename')!=-1:
-				fileName = i.find('img')['filename']
+				imgSrc = i.find('img')['src']
+				fileName = imgSrc.split('/')[-1]+"-"+i.find('img')['filename']
 				imgSrc = i.find('img')['src']+"?original"
 				imgBuf = urllib.request.urlopen(imgSrc)
 				try:
@@ -143,4 +145,4 @@ def ghap(codeList):
 		print("%d end" %(code))
 	driver.quit()
 
-ghap(range(1,5001))
+ghap(range(1,5306))
