@@ -74,7 +74,7 @@ def ghap(codeList):
 			writeLog("Making \'%s\' file fail\n" %(title))
 			f.close()
 			continue
-			
+
 		html_header = "<html><head><title>%s</title></head><body><br><h2>%s</h2><br>" %(title, title)
 		f.write(html_header)
 		f.write("<div class=\"category\">%s</div><br>" %(category))
@@ -83,11 +83,12 @@ def ghap(codeList):
 		article = soup.find('div', { 'class': 'article' })
 		p = article.find_all('p')
 		f.write("<div class=\"article\">")
+		num = 1
 		for i in p:
 			if i.find('img') is not None and str(i.find('img')).find('filename')!=-1:
-				imgSrc = i.find('img')['src']
-				fileName = imgSrc.split('/')[-1]+"-"+i.find('img')['filename']
 				imgSrc = i.find('img')['src']+"?original"
+				fileExt = i.find('img')['filename'].split('.')[-1]
+				fileName = "%03d.%s" %(num,fileExt)
 				imgBuf = urllib.request.urlopen(imgSrc)
 				try:
 					imgBuf = imgBuf.read()
@@ -107,6 +108,7 @@ def ghap(codeList):
 				pos1 = str(i).find("<span class=\"imageblock\"")
 				pos2 = str(i).find("</p>", pos1)
 				f.write(str(i)[:pos1]+"<img src=\"%d_%s/%s\"></p><br>" %(code,titleWin,fileName)+str(i)[pos2:])
+				num+=1
 			else:
 				f.write(str(i))
 		f.write("</div><br>")
