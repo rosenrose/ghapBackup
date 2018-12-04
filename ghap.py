@@ -41,7 +41,7 @@ def ghap(codeList):
 		try:
 			element = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"imageblock")))
 		except:
-			writeLog("%d not fully loaded\n" %(code))
+			writeLog("%d has no images\n" %(code))
 			continue
 
 		soup = BeautifulSoup(driver.page_source, 'html.parser')
