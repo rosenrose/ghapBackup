@@ -89,7 +89,12 @@ def ghap(codeList):
 				imgSrc = i.find('img')['src']+"?original"
 				fileExt = i.find('img')['filename'].split('.')[-1]
 				fileName = "%03d.%s" %(num,fileExt)
-				imgBuf = urllib.request.urlopen(imgSrc)
+				try:
+					imgBuf = urllib.request.urlopen(imgSrc)
+				except:
+					writeLog("%d_%s/%s open fail\n" %(code,titleWin,fileName))
+					continue
+
 				try:
 					imgBuf = imgBuf.read()
 				except:
