@@ -150,6 +150,7 @@ def ghap(codeList):
 		f.write(html_footer)
 		f.close()
 		print("%d end" %(code))
+		time.sleep(5)
 	driver.quit()
 
 ghap(range(1,5306))
