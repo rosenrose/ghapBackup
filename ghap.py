@@ -144,15 +144,19 @@ def ghap(codeList):
 			f.write("\t\t\t<li><a href=\"%s.html\">%s</a></li>\n" %(anotherCode, anotherTitle))
 		f.write("\t\t</ul>\n</div><br/>\n")
 
-		comment = str(soup.find('div', { 'class': 'cb_module cb_fluid' }))
-		while(comment.find("<a href=\"/toolbar") != -1):
-			pos1 = comment.find("<a href=\"/toolbar")
-			pos2 = comment.find("</span>", pos1)
-			comment = comment[:pos1]+comment[pos2:]
-			pos1 = comment.find("<span>")
-			pos2 = comment.find("</div>", pos1)
-			comment = comment[:pos1]+comment[pos2:]
-		f.write(comment)
+		comment = soup.find('div', { 'class': 'cb_module cb_fluid' })
+		firstCmt = comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)
+		for i in range(len(firstCmt)):
+			comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find_all('div',{'class':'cb_section'})[1].find_all('span',recursive=False)[0].a.decompose()
+			comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find_all('div',{'class':'cb_section'})[1].find_all('span',recursive=False)[1].decompose()
+			comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find_all('div',{'class':'cb_section'})[1].find_all('span',recursive=False)[1].decompose()
+			
+			if comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find('ul') is not None:
+				secondCmt = comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find('ul').find_all('li')
+				for j in range(len(secondCmt)):
+					comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find('ul').find_all('li')[j].find_all('div',{'class':'cb_section'})[1].find_all('span',recursive=False)[0].a.decompose()
+					comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find('ul').find_all('li')[j].find_all('div',{'class':'cb_section'})[1].find_all('span',recursive=False)[1].decompose()
+		f.write(str(comment))
 
 		f.write(html_footer)
 		f.close()
