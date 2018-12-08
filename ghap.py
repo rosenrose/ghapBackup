@@ -11,11 +11,16 @@ from selenium.webdriver.support import expected_conditions as EC
 url = "https://ghaptouhou.tistory.com"
 path = "D:/Touhou/ghap"
 logfile = "log.log"
-html_footer = "</body></html>"
-driver = webdriver.Chrome("D:/Install/chromedriver.exe")
-wait = WebDriverWait(driver,5)
+html_footer = "\n</body>\n</html>"
 catRegex = re.compile('(동방 동인지|합동인지|동방 웹코믹|세로 식질 유배소)')
 codeRegex = re.compile('[0-9]*')
+
+#options = webdriver.ChromeOptions()
+#options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36")
+#driver = webdriver.Chrome("D:/Install/chromedriver.exe", chrome_options=options)
+driver = webdriver.Chrome("D:/Install/chromedriver.exe")
+#wait = WebDriverWait(driver,5)
+driver.implicitly_wait(3)
 
 def writeLog(msg):
 	with open("%s/%s"%(path, logfile), 'a', encoding="utf-8-sig") as a:
@@ -76,20 +81,21 @@ def ghap(codeList):
 			f.close()
 			continue
 
-		html_header = "<html><head><title>%s</title></head><body><br><h2>%s</h2><br>" %(title, title)
+		html_header = "<html>\n<head>\n\t<title>%s</title>\n</head>\n<body>\n\t<h2>%s</h2><br/>\n" %(title, title)
 		f.write(html_header)
-		f.write("<div class=\"category\">%s</div><br>" %(category))
-		f.write("<div class=\"date\">%s</div><br>" %(date))
+		f.write("<div class=\"category\">%s</div><br/>\n" %(category))
+		f.write("<div class=\"date\">%s</div><br/>\n" %(date))
 
 		article = soup.find('div', { 'class': 'article' })
 		p = article.find_all('p')
-		f.write("<div class=\"article\">")
+		f.write("<div class=\"article\">\n")
 		num = 1
 		for i in p:
 			if i.find('img') is not None and str(i.find('img')).find('filename')!=-1:
 				imgSrc = i.find('img')['src']+"?original"
 				fileExt = i.find('img')['filename'].split('.')[-1]
 				fileName = "%03d.%s" %(num,fileExt)
+				
 				try:
 					imgBuf = urllib.request.urlopen(imgSrc)
 				except:
@@ -111,31 +117,32 @@ def ghap(codeList):
 					imgFile.write(imgBuf)
 				finally:
 					imgFile.close()
+				
 				pos1 = str(i).find("<span class=\"imageblock\"")
 				pos2 = str(i).find("</p>", pos1)
-				f.write(str(i)[:pos1]+"<img src=\"%d_%s/%s\"></p><br>" %(code,titleWin,fileName)+str(i)[pos2:])
+				f.write("\t"+str(i)[:pos1]+"<img src=\"%d_%s/%s\">" %(code,titleWin,fileName)+str(i)[pos2:]+"\n")
 				num+=1
 			else:
-				f.write(str(i))
-		f.write("</div><br>")
+				f.write("\t"+str(i)+"\n")
+		f.write("</div><br/>\n")
 
 		tag = soup.find('div', { 'class': 'tagTrail' })
-		f.write("<div class=\"tagTrail\">")
+		f.write("<div class=\"tagTrail\">\n")
 		if tag is not None:
 			tag = tag.find_all('a')[1:]
-			f.write("<p>태그: </p><ul>")
+			f.write("\t<p>태그: </p>\n\t\t<ul>\n")
 			for i in tag:
-				f.write("<li>%s</li>"%(i.text))
-			f.write("</ul></div><br>")
+				f.write("\t\t\t<li>%s</li>\n"%(i.text))
+			f.write("\t\t</ul>\n</div><br/>\n")
 
+		f.write("<div class=\"another\">\n")
+		f.write("\t<p>'%s' 카테고리의 다른 글</p>\n\t\t<ul>\n" %(category))
 		another = soup.find('div', { 'class': 'another_category another_category_color_gray' }).find('table').find_all('a')
-		f.write("<div class=\"another\">")
-		f.write("<p>'%s' 카테고리의 다른 글</p><ul>" %(category))
 		for i in another:
 			anotherTitle = i.text
 			anotherCode = codeRegex.findall(i['href'])[1]
-			f.write("<li><a href=\"%s.html\">%s</a></li>" %(anotherCode, anotherTitle))
-		f.write("</ul></div><br>")
+			f.write("\t\t\t<li><a href=\"%s.html\">%s</a></li>\n" %(anotherCode, anotherTitle))
+		f.write("\t\t</ul>\n</div><br/>\n")
 
 		comment = str(soup.find('div', { 'class': 'cb_module cb_fluid' }))
 		while(comment.find("<a href=\"/toolbar") != -1):
@@ -150,7 +157,7 @@ def ghap(codeList):
 		f.write(html_footer)
 		f.close()
 		print("%d end" %(code))
-		time.sleep(5)
+		time.sleep(3)
 	driver.quit()
 
-ghap(range(1,5306))
+ghap(range(1,5321))
