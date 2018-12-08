@@ -19,8 +19,8 @@ codeRegex = re.compile('[0-9]*')
 #options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36")
 #driver = webdriver.Chrome("D:/Install/chromedriver.exe", chrome_options=options)
 driver = webdriver.Chrome("D:/Install/chromedriver.exe")
-#wait = WebDriverWait(driver,5)
-driver.implicitly_wait(3)
+wait = WebDriverWait(driver,5)
+#driver.implicitly_wait(3)
 
 def writeLog(msg):
 	with open("%s/%s"%(path, logfile), 'a', encoding="utf-8-sig") as a:
@@ -157,7 +157,7 @@ def ghap(codeList):
 		f.write(html_footer)
 		f.close()
 		print("%d end" %(code))
-		time.sleep(3)
+		time.sleep(5)
 	driver.quit()
 
 ghap(range(1,5321))
