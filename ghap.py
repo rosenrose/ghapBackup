@@ -15,6 +15,7 @@ html_footer = "</body></html>"
 driver = webdriver.Chrome("D:/Install/chromedriver.exe")
 wait = WebDriverWait(driver,5)
 catRegex = re.compile('(동방 동인지|합동인지|동방 웹코믹|세로 식질 유배소)')
+codeRegex = re.compile('[0-9]*')
 
 def writeLog(msg):
 	with open("%s/%s"%(path, logfile), 'a', encoding="utf-8-sig") as a:
@@ -130,7 +131,6 @@ def ghap(codeList):
 		another = soup.find('div', { 'class': 'another_category another_category_color_gray' }).find('table').find_all('a')
 		f.write("<div class=\"another\">")
 		f.write("<p>'%s' 카테고리의 다른 글</p><ul>" %(category))
-		codeRegex = re.compile('[0-9]*')
 		for i in another:
 			anotherTitle = i.text
 			anotherCode = codeRegex.findall(i['href'])[1]
