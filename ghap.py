@@ -46,12 +46,12 @@ def ghap(codeList):
 		current_code = driver.current_url.split('/')[-1]
 
 		soup = BeautifulSoup(driver.page_source, 'html.parser')
-		tdiv = soup.find('div', { 'class': 'tdiv' })
+		tdiv = soup.find('div',class_='tdiv')
 		if (tdiv is None) or (int(current_code) != code):
 			writeLog("%d does not exist\n" %(code))
 			continue
-
-		category = tdiv.find('div', { 'class': 'ect' }).find('a').text
+		
+		category = tdiv.find('div',class_='ect').find('a').text
 		if not (catRegex.match(category)):
 			writeLog("%d out of category (%s)\n" %(code, category))
 			continue
@@ -85,13 +85,13 @@ def ghap(codeList):
 		f.write(html_header)
 		f.write("<div class=\"category\">%s</div><br/>\n" %(category))
 		f.write("<div class=\"date\">%s</div><br/>\n" %(date))
-
-		article = soup.find('div', { 'class': 'article' })
+		
+		article = soup.find('div',class_='article')
 		p = article.find_all('p')
 		f.write("<div class=\"article\">\n")
 		num = 1
 		for i in p:
-			if i.find('img') is not None and str(i.find('img')).find('filename')!=-1:
+			if i.find('img') is not None and i.find('img').has_attr('filename'):
 				imgSrc = i.find('img')['src']+"?original"
 				fileExt = i.find('img')['filename'].split('.')[-1]
 				fileName = "%03d.%s" %(num,fileExt)
@@ -125,8 +125,8 @@ def ghap(codeList):
 			else:
 				f.write("\t"+str(i)+"\n")
 		f.write("</div><br/>\n")
-
-		tag = soup.find('div', { 'class': 'tagTrail' })
+		
+		tag = soup.find('div',class_='tagTrail')
 		f.write("<div class=\"tagTrail\">\n")
 		if tag is not None:
 			tag = tag.find_all('a')[1:]
@@ -137,25 +137,25 @@ def ghap(codeList):
 
 		f.write("<div class=\"another\">\n")
 		f.write("\t<p>'%s' 카테고리의 다른 글</p>\n\t\t<ul>\n" %(category))
-		another = soup.find('div', { 'class': 'another_category another_category_color_gray' }).find('table').find_all('a')
+		another = soup.find('div',class_='another_category another_category_color_gray').find('table').find_all('a')
 		for i in another:
 			anotherTitle = i.text
 			anotherCode = codeRegex.findall(i['href'])[1]
 			f.write("\t\t\t<li><a href=\"%s.html\">%s</a></li>\n" %(anotherCode, anotherTitle))
 		f.write("\t\t</ul>\n</div><br/>\n")
-
-		comment = soup.find('div', { 'class': 'cb_module cb_fluid' })
-		firstCmt = comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)
+		
+		comment = soup.find('div',class_='cb_module cb_fluid')
+		firstCmt = comment.find('div',class_='cb_lstcomment').find('ul').find_all('li',recursive=False)
 		for i in range(len(firstCmt)):
-			comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find_all('div',{'class':'cb_section'})[1].find_all('span',recursive=False)[0].a.decompose()
-			comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find_all('div',{'class':'cb_section'})[1].find_all('span',recursive=False)[1].decompose()
-			comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find_all('div',{'class':'cb_section'})[1].find_all('span',recursive=False)[1].decompose()
+			comment.find('div',class_='cb_lstcomment').find('ul').find_all('li',recursive=False)[i].find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[0].a.decompose()
+			comment.find('div',class_='cb_lstcomment').find('ul').find_all('li',recursive=False)[i].find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[1].decompose()
+			comment.find('div',class_='cb_lstcomment').find('ul').find_all('li',recursive=False)[i].find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[1].decompose()
 			
-			if comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find('ul') is not None:
-				secondCmt = comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find('ul').find_all('li')
+			if comment.find('div',class_='cb_lstcomment').find('ul').find_all('li',recursive=False)[i].find('ul') is not None:
+				secondCmt = comment.find('div',class_='cb_lstcomment').find('ul').find_all('li',recursive=False)[i].find('ul').find_all('li')
 				for j in range(len(secondCmt)):
-					comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find('ul').find_all('li')[j].find_all('div',{'class':'cb_section'})[1].find_all('span',recursive=False)[0].a.decompose()
-					comment.find('div',{'class':'cb_lstcomment'}).find('ul').find_all('li',recursive=False)[i].find('ul').find_all('li')[j].find_all('div',{'class':'cb_section'})[1].find_all('span',recursive=False)[1].decompose()
+					comment.find('div',class_='cb_lstcomment').find('ul').find_all('li',recursive=False)[i].find('ul').find_all('li')[j].find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[0].a.decompose()
+					comment.find('div',class_='cb_lstcomment').find('ul').find_all('li',recursive=False)[i].find('ul').find_all('li')[j].find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[1].decompose()
 		f.write(str(comment))
 
 		f.write(html_footer)
