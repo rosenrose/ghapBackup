@@ -85,7 +85,7 @@ def sniperriflesr(codeList):
 		f.write("<div class=\"article\">\n")
 		num = 1
 		for i in p:
-			if i.find('img') is not None and str(i.find('img')).find('data-filename')!=-1:
+			if i.find('img') is not None and i.find('img').has_attr('data-filename'):
 				imgSrc = i.find('img')['src'].replace("image","original")
 				fileExt = i.find('img')['data-filename'].split('.')[-1]
 				fileName = "%03d.%s" %(num,fileExt)
