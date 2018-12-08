@@ -14,6 +14,7 @@ logfile = "log.log"
 html_footer = "</body></html>"
 driver = webdriver.Chrome("D:/Install/chromedriver.exe")
 wait = WebDriverWait(driver,5)
+catRegex = re.compile('(동방 동인지|합동인지|동방 웹코믹|세로 식질 유배소)')
 
 def writeLog(msg):
 	with open("%s/%s"%(path, logfile), 'a', encoding="utf-8-sig") as a:
@@ -45,7 +46,6 @@ def ghap(codeList):
 			continue
 
 		category = tdiv.find('div', { 'class': 'ect' }).find('a').text
-		catRegex = re.compile('(동방 동인지|합동인지|동방 웹코믹|세로 식질 유배소)')
 		if not (catRegex.match(category)):
 			writeLog("%d out of category (%s)\n" %(code, category))
 			continue
