@@ -111,8 +111,8 @@ def sniperriflesr(codeList):
 				finally:
 					imgFile.close()
 				pos1 = str(i).find("<img")
-				pos2 = str(i).find("</p>", pos1)
-				f.write("\t"+str(i)[:pos1].replace("<p>","<p style=\"TEXT-ALIGN: center\">")+"<img src=\"%d_%s/%s\">" %(code,titleWin,fileName)+str(i)[pos2:]+"\n")
+				pos2 = str(i).find(">", pos1)
+				f.write("\t"+str(i)[:pos1].replace("<p>","<p style=\"TEXT-ALIGN: center\">")+"<img src=\"%d_%s/%s\">" %(code,titleWin,fileName)+str(i)[pos2+1:]+"\n")
 				num+=1
 			else:
 				f.write("\t"+str(i).replace("<p>","<p style=\"TEXT-ALIGN: center\">")+"\n")
