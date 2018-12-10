@@ -146,16 +146,16 @@ def ghap(codeList):
 		
 		comment = soup.find('div',class_='cb_lstcomment')
 		firstCmt = comment.ul.find_all('li',recursive=False)
-		for i in range(len(firstCmt)):
-			comment.ul.find_all('li',recursive=False)[i].find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[0].a.decompose()
-			comment.ul.find_all('li',recursive=False)[i].find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[1].decompose()
-			comment.ul.find_all('li',recursive=False)[i].find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[1].decompose()
+		for i in firstCmt:
+			i.find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[0].a.decompose()
+			i.find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[1].decompose()
+			i.find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[1].decompose()
 			
-			if comment.ul.find_all('li',recursive=False)[i].ul is not None:
-				secondCmt = comment.ul.find_all('li',recursive=False)[i].ul.find_all('li')
-				for j in range(len(secondCmt)):
-					comment.ul.find_all('li',recursive=False)[i].ul.find_all('li')[j].find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[0].a.decompose()
-					comment.ul.find_all('li',recursive=False)[i].ul.find_all('li')[j].find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[1].decompose()
+			if i.ul is not None:
+				secondCmt = i.ul.find_all('li')
+				for j in secondCmt:
+					j.find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[0].a.decompose()
+					j.find_all('div',class_='cb_section')[1].find_all('span',recursive=False)[1].decompose()
 		f.write(str(comment))
 
 		f.write(html_footer)
