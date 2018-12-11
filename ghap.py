@@ -2,6 +2,7 @@ import os
 import re
 import urllib.request
 import time
+import sys
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -162,6 +163,9 @@ def ghap(codeList):
 		f.close()
 		print("%d end" %(code))
 		time.sleep(5)
-	driver.quit()
 
-ghap(range(1,5321))
+if len(sys.argv) == 2:
+	ghap([int(sys.argv[1])])
+elif len(sys.argv) == 3:
+	ghap(range(int(sys.argv[1]),int(sys.argv[2])+1))
+driver.quit()
