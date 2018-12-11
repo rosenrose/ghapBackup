@@ -179,8 +179,9 @@ def sniperriflesr(codeList):
 					if sswitch:
 						sulTag.append(sliTag)
 						fliTag.append(sulTag)
-					fulTag.append(fliTag)
-					comment.insert(0,fulTag)
+					if fswitch:
+						fulTag.append(fliTag)
+						comment.insert(0,fulTag)
 					break;
 			if not sswitch:
 				fliTag.append(comment.contents[0])
