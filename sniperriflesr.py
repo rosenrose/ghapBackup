@@ -62,9 +62,14 @@ def sniperriflesr(codeList):
 			continue
 		
 		title = soup.find('title').text
-		for i in title.split('-'):
-			if i.find("東方 Project") == -1:
-				title = i.strip()
+		pos1 = title.find('東方 Project')
+		if pos1 != -1:
+			pos2 = title.find('-', pos1)
+			if pos2 != -1:
+				title = title[pos2+1:].strip()
+			else:
+				pos2 = title.rfind('-', pos1)
+				title = title[:pos2].strip()
 		date = main.find('span',class_='cB_Tdate').text
 
 		titleWin = replaceSpecialCh(title)
@@ -134,9 +139,14 @@ def sniperriflesr(codeList):
 		another = soup.find('div',class_='cContentCateMore').find_all('li')
 		for i in another:
 			anotherTitle = i.find('a')['title']
-			for j in anotherTitle.split('-'):
-				if j.find("東方 Project") == -1:
-					anotherTitle = j.strip()
+			pos1 = anotherTitle.find('東方 Project')
+			if pos1 != -1:
+				pos2 = anotherTitle.find('-', pos1)
+				if pos2 != -1:
+					anotherTitle = anotherTitle[pos2+1:].strip()
+				else:
+					pos2 = anotherTitle.rfind('-', pos1)
+					anotherTitle = anotherTitle[:pos2].strip()
 
 			if str(i.find('a')).find("href") != -1:
 				anotherCode = i.find('a')['href']
@@ -188,25 +198,30 @@ def sniperriflesr(codeList):
 			else:
 				sliTag.append(comment.contents[0])
 		
-		firstCmt = comment.contents[0].find_all('li',class_="firstCmt")
+		firstCmt = comment.find_all('li',class_="firstCmt")
 		for i in firstCmt:
 			i.find('ul',class_="opinionListMenu").name = 'div'
-			i.find('li',class_="icon").name = 'div'
+			if i.find('li',class_="icon") is not None:
+				i.find('li',class_="icon").name = 'div'
 			i.find('li',class_="fl").name = 'div'
 			if i.find('li',class_="sDateTime") is not None:
 				i.find('li',class_="sDateTime").name = 'div'
-			i.find('li',class_="opinionBtn").decompose()
+			if i.find('li',class_="opinionBtn") is not None:
+				i.find('li',class_="opinionBtn").decompose()
 
 			if i.find('li',class_="secondCmt") is not None:
 				secondCmt = i.find_all('li',class_="secondCmt")
 				for j in secondCmt:
 					j.find('ul',class_="opinionListMenuRe").name = 'div'
 					j.find('li',class_="reIcon").name = 'div'
-					j.find('li',class_="icon").name = 'div'
-					j.find('li',class_="fl").name = 'div'
+					if j.find('li',class_="icon") is not None:
+						j.find('li',class_="icon").name = 'div'
+					if j.find('li',class_="fl") is not None:
+						j.find('li',class_="fl").name = 'div'
 					if j.find('li',class_="sDateTime") is not None:
 						j.find('li',class_="sDateTime").name = 'div'
-					j.find('li',class_="opinionBtn").decompose()
+					if j.find('li',class_="opinionBtn") is not None:
+						j.find('li',class_="opinionBtn").decompose()
 		f.write(str(comment))
 		
 		f.write(html_footer)
@@ -214,7 +229,11 @@ def sniperriflesr(codeList):
 		print("%d end" %(code))
 		time.sleep(5)
 
-if len(sys.argv) == 2:
-	sniperriflesr([int(sys.argv[1])])
-elif len(sys.argv) == 3:
-	sniperriflesr(range(int(sys.argv[1]),int(sys.argv[2])+1))
+
+for i in range(1, len(sys.argv)):
+	if sys.argv[i].find('-') == -1:
+		sniperriflesr([int(sys.argv[i])])
+	else:
+		c1 = sys.argv[i].split('-')[0]
+		c2 = sys.argv[i].split('-')[1]
+		sniperriflesr(range(int(c1),int(c2)+1))
