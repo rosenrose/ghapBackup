@@ -164,8 +164,11 @@ def ghap(codeList):
 		print("%d end" %(code))
 		time.sleep(5)
 
-if len(sys.argv) == 2:
-	ghap([int(sys.argv[1])])
-elif len(sys.argv) == 3:
-	ghap(range(int(sys.argv[1]),int(sys.argv[2])+1))
+for i in range(1, len(sys.argv)):
+	if sys.argv[i].find('-') == -1:
+		ghap([int(sys.argv[i])])
+	else:
+		c1 = sys.argv[i].split('-')[0]
+		c2 = sys.argv[i].split('-')[1]
+		ghap(range(int(c1),int(c2)+1))
 driver.quit()
