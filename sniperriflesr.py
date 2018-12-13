@@ -16,12 +16,12 @@ catIDList = [3,5,6,7,8,32,38,46,50,51,52,104,105,114,115,117,118,119,122,134,141
 codeRegex = re.compile('[0-9]*')
 
 def writeLog(msg):
-	with open("%s/%s"%(path, logfile), 'a', encoding="utf-8-sig") as a:
+	with open("%s/%s"%(path,logfile),'a',encoding="utf-8-sig") as a:
 		a.write(msg)
 
 def replaceSpecialCh(title):
-	res = title.replace('\\', '＼')
-	res = res.replace('/', '／')
+	res = title.replace('\\','＼')
+	res = res.replace('/','／')
 	res = res.replace(':','：')
 	res = res.replace('*','＊')
 	res = res.replace('?','？')
@@ -35,8 +35,8 @@ def replaceSpecialCh(title):
 def sniperriflesr(codeList):
 	for code in codeList:
 		print("%d start" %(code))
-		response = requests.get("%s=%d" %(url, code))
-		soup = BeautifulSoup(response.content, 'html.parser')
+		response = requests.get("%s=%d" %(url,code))
+		soup = BeautifulSoup(response.content,'html.parser')
 		
 		main = soup.find('div',class_='articlePrint')
 		if main is None:
@@ -55,8 +55,8 @@ def sniperriflesr(codeList):
 			continue
 		category = main.find('span',class_='cB_Folder').find('a').text
 
-		articleResponse = requests.get("%s=%d" %(articleUrl, code))
-		articleSoup = BeautifulSoup(articleResponse.content, 'html.parser')
+		articleResponse = requests.get("%s=%d" %(articleUrl,code))
+		articleSoup = BeautifulSoup(articleResponse.content,'html5lib')
 		if not articleSoup.find('img',class_='txc-image'):
 			writeLog("%d has no image\n" %(code))
 			continue
@@ -64,16 +64,16 @@ def sniperriflesr(codeList):
 		title = soup.find('title').text
 		pos1 = title.find('東方 Project')
 		if pos1 != -1:
-			pos2 = title.find('-', pos1)
+			pos2 = title.find('-',pos1)
 			if pos2 != -1:
 				title = title[pos2+1:].strip()
 			else:
-				pos2 = title.rfind('-', pos1)
+				pos2 = title.rfind('-',0,pos1)
 				title = title[:pos2].strip()
 		date = main.find('span',class_='cB_Tdate').text
 
 		titleWin = replaceSpecialCh(title)
-		doc = "%s/%d" %(path, code)
+		doc = "%s/%d" %(path,code)
 		if not os.path.isdir("%s_%s" %(doc,titleWin)):
 			try:
 				os.mkdir("%s_%s" %(doc,titleWin))
@@ -82,13 +82,13 @@ def sniperriflesr(codeList):
 				continue
 
 		try:
-			f = open(doc+".html", "w", encoding="utf-8-sig")
+			f = open(doc+".html","w",encoding="utf-8-sig")
 		except:
 			writeLog("Making \'%s\' file fail\n" %(title))
 			f.close()
 			continue
 
-		html_header = "<html>\n<head>\n\t<title>%s</title>\n</head>\n<body>\n\t<h2>%s</h2><br/>\n" %(title, title)
+		html_header = "<html>\n<head>\n\t<title>%s</title>\n</head>\n<body>\n\t<h2>%s</h2><br/>\n" %(title,title)
 		f.write(html_header)
 		f.write("<div class=\"category\">%s</div><br/>\n" %(category))
 		f.write("<div class=\"date\">%s</div><br/>\n" %(date))
@@ -117,7 +117,7 @@ def sniperriflesr(codeList):
 					continue
 
 				try:
-					imgFile = open("%s_%s/%s" %(doc,titleWin,fileName), "wb")
+					imgFile = open("%s_%s/%s" %(doc,titleWin,fileName),"wb")
 				except:
 					writeLog("Making %d_%s/%s fail\n" %(code,titleWin,fileName))
 					continue
@@ -127,7 +127,7 @@ def sniperriflesr(codeList):
 					imgFile.close()
 				
 				pos1 = str(i).find("<img")
-				pos2 = str(i).find(">", pos1)
+				pos2 = str(i).find(">",pos1)
 				f.write("\t"+str(i)[:pos1].replace("<p>","<p style=\"TEXT-ALIGN: center\">")+"<img src=\"%d_%s/%s\">" %(code,titleWin,fileName)+str(i)[pos2+1:]+"\n")
 				num+=1
 			else:
@@ -141,17 +141,17 @@ def sniperriflesr(codeList):
 			anotherTitle = i.find('a')['title']
 			pos1 = anotherTitle.find('東方 Project')
 			if pos1 != -1:
-				pos2 = anotherTitle.find('-', pos1)
+				pos2 = anotherTitle.find('-',pos1)
 				if pos2 != -1:
 					anotherTitle = anotherTitle[pos2+1:].strip()
 				else:
-					pos2 = anotherTitle.rfind('-', pos1)
+					pos2 = anotherTitle.rfind('-',0,pos1)
 					anotherTitle = anotherTitle[:pos2].strip()
 
 			if str(i.find('a')).find("href") != -1:
 				anotherCode = i.find('a')['href']
 				anotherCode = codeRegex.findall(anotherCode.split('&')[1])[-2]
-				f.write("\t\t\t<li><a href=\"%s.html\">%s</a></li>\n" %(anotherCode, anotherTitle))
+				f.write("\t\t\t<li><a href=\"%s.html\">%s</a></li>\n" %(anotherCode,anotherTitle))
 			else:
 				f.write("\t\t\t<li>%s</li>\n" %(anotherTitle))
 		f.write("\t\t</ul>\n</div><br/>\n")
@@ -164,7 +164,7 @@ def sniperriflesr(codeList):
 		sliTag = soup.new_tag("li",**{'class':'secondCmt'})
 		sswitch = False
 		while True:
-			if isinstance(comment.contents[0], bs4.element.Tag):
+			if isinstance(comment.contents[0],bs4.element.Tag):
 				if comment.contents[0].has_attr('class'):
 					if comment.contents[0]['class'][0] == "opinionListMenu":
 						if fswitch:
@@ -230,7 +230,7 @@ def sniperriflesr(codeList):
 		time.sleep(5)
 
 
-for i in range(1, len(sys.argv)):
+for i in range(1,len(sys.argv)):
 	if sys.argv[i].find('-') == -1:
 		sniperriflesr([int(sys.argv[i])])
 	else:
