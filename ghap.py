@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 url = "https://ghaptouhou.tistory.com"
-path = "D:/Touhou/ghap"
+path = "D:/Touhou/doujin/ghap"
 logfile = "log.log"
 html_footer = "\n</body>\n</html>"
 catRegex = re.compile('(동방 동인지|합동인지|동방 웹코믹|세로 식질 유배소)')
@@ -38,6 +38,7 @@ def replaceSpecialCh(title):
 	res = res.replace('>','〉')
 	res = res.replace('|','｜')
 	res = res.replace('.','．')
+	res = res.replace('#','＃')
 	return res
 
 def ghap(codeList):
@@ -164,7 +165,7 @@ def ghap(codeList):
 		print("%d end" %(code))
 		time.sleep(5)
 
-for i in range(1, len(sys.argv)):
+for i in range(1,len(sys.argv)):
 	if sys.argv[i].find('-') == -1:
 		ghap([int(sys.argv[i])])
 	else:

@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 url = "http://blog.daum.net/_blog/BlogTypeView.do?blogid=0qN5Q&articleno"
 articleUrl = "http://blog.daum.net/_blog/hdn/ArticleContentsView.do?blogid=0qN5Q&articleno"
-path = "D:/Touhou/sniperriflesr"
+path = "D:/Touhou/doujin/sniperriflesr"
 logfile = "log.log"
 html_footer = "\n</body>\n</html>"
 catIDList = [3,5,6,7,8,32,38,46,50,51,52,104,105,114,115,117,118,119,122,134,141,156,161,185,204,210,211,212,216,384,385,386,387,388,389,390,391,432,433]
@@ -30,6 +30,7 @@ def replaceSpecialCh(title):
 	res = res.replace('>','〉')
 	res = res.replace('|','｜')
 	res = res.replace('.','．')
+	res = res.replace('#','＃')
 	return res
 
 def sniperriflesr(codeList):
