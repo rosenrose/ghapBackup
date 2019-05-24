@@ -3,11 +3,15 @@ import re
 import urllib.request
 import time
 import sys
+sys.path.append("C:/users/crazy/pictures/python")
+import bs4
+import subprocess
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from replaceSpecialCh import replaceSpecialCh
 
 url = "https://nonicname.tistory.com"
 path = "D:/Touhou/doujin/nonicname"
@@ -27,26 +31,15 @@ def writeLog(msg):
 	with open("%s/%s"%(path, logfile), 'a', encoding="utf-8-sig") as a:
 		a.write(msg)
 
-def replaceSpecialCh(title):
-	res = title.replace('\\', '＼')
-	res = res.replace('/', '／')
-	res = res.replace(':','：')
-	res = res.replace('*','＊')
-	res = res.replace('?','？')
-	res = res.replace('\"','＂')
-	res = res.replace('<','〈')
-	res = res.replace('>','〉')
-	res = res.replace('|','｜')
-	res = res.replace('.','．')
-	res = res.replace('#','＃')
-	return res
-
 def nonicname(codeList):
 	for code in codeList:
 		print("%d start" %(code))
 		driver.get("%s/%d" %(url, code))
 
 		soup = BeautifulSoup(driver.page_source,"html.parser")
+		notes = soup.find_all(text=lambda text:isinstance(text,bs4.element.Comment))
+		for note in notes: note.extract()
+
 		tdiv = soup.find("div",class_="area_title")
 		if tdiv is None:
 			writeLog("%d does not exist\n" %(code))
@@ -60,7 +53,7 @@ def nonicname(codeList):
 			writeLog("%d has no image\n" %(code))
 			continue
 
-		date = tdiv.find("span",class_="txt_bar").text.strip()
+		date = tdiv.find("span",class_="txt_detail my_post").text.replace("nonicname","").strip()
 		title = tdiv.find("h3").find("a").text
 		left = title.find('[')
 		right = title.find(']')
@@ -92,50 +85,50 @@ def nonicname(codeList):
 		article = soup.find("div",class_="tt_article_useless_p_margin")
 		article.find("div",class_="container_postbtn").decompose()
 
-		p = article.find_all("p")
+		p = article.find_all("img")
 		f.write("<div class=\"article\">\n")
-		num = 1
-		for i in p:
-			if i.find("img") is not None and i.find("img").has_attr("filename"):
-				imgSrc = i.find("img")["src"]+"?original"
+		i=0
+		while(i < len(p)):
+			if p[i].has_attr("filename"):
 				fileExt = i.find("img")["filename"].split('.')[-1]
-				fileName = "%03d.%s" %(num,fileExt)
-				
-				try:
-					imgBuf = urllib.request.urlopen(imgSrc)
-				except:
-					writeLog("%d_%s/%s open fail\n" %(code,titleWin,fileName))
-					continue
-
-				try:
-					imgBuf = imgBuf.read()
-				except:
-					writeLog("%d_%s/%s reading fail\n" %(code,titleWin,fileName))
-					continue
-
-				try:
-					imgFile = open("%s_%s/%s" %(doc,titleWin,fileName), "wb")
-				except:
-					writeLog("Making %d_%s/%s fail\n" %(code,titleWin,fileName))
-					continue
+			elif p[i].has_attr("filemime"):
+				if p[i]["filemime"].find("jp") != -1:
+					fileExt = "jpg"
 				else:
-					imgFile.write(imgBuf)
-				finally:
-					imgFile.close()
+					fileExt = "png"
+			else:
+				fileExt = "jpg"
 				
-				span = i.find("span")
-				if span is not None:
-					span.unwrap()
-				span = i.find("span")
-				if span is not None:
-					span.unwrap()
+			imgSrc = p[i]["src"]+"?original"
+			fileName = "%03d.%s" %(i+1,fileExt)
+				
+			try:
+				imgBuf = urllib.request.urlopen(imgSrc)
+			except:
+				writeLog("%d_%s/%s open fail\n" %(code,titleWin,fileName))
+				continue
 
-				for attr in list(i.find("img").attrs):
-					if attr != "src":
-						del i.find("img")[attr]
-				i.find("img").attrs["src"] = "%d_%s/%s" %(code,titleWin,fileName)
-				num+=1
-		
+			try:
+				imgBuf = imgBuf.read()
+			except:
+				writeLog("%d_%s/%s reading fail\n" %(code,titleWin,fileName))
+				continue
+
+			try:
+				imgFile = open("%s_%s/%s" %(doc,titleWin,fileName), "wb")
+			except:
+				writeLog("Making %d_%s/%s fail\n" %(code,titleWin,fileName))
+				continue
+			else:
+				imgFile.write(imgBuf)
+			finally:
+				imgFile.close()
+				
+			for attr in list(p[i].attrs):
+				if attr != "src":
+					del p[i][attr]
+			p[i].attrs["src"] = "%d_%s/%s" %(code,titleWin,fileName)
+			i+=1
 		f.write(str(article))
 		f.write("\n<p>작가: %s</p><br/>\n"%(author))
 		f.write("</div><br/>\n")
@@ -214,3 +207,4 @@ for i in range(1,len(sys.argv)):
 		c2 = sys.argv[i].split('-')[1]
 		nonicname(range(int(c1),int(c2)+1))
 driver.quit()
+subprocess.run(["python","htmlToGit.py","nonicname","add"]+sys.argv[1:],encoding="utf-8",cwd="c:/users/crazy/pictures/python")

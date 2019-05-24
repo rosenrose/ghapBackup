@@ -211,7 +211,7 @@ while(True):
 	else:
 		cachelist.append(temp)
 
-mode = "d"
+mode = "m"
 selenium = False
 local = False
 ghap(cachelist)

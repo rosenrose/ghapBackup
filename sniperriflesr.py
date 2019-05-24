@@ -5,7 +5,9 @@ import requests
 import time
 import bs4
 import sys
+sys.path.append("C:/users/crazy/pictures/python")
 from bs4 import BeautifulSoup
+from replaceSpecialCh import replaceSpecialCh
 
 url = "http://blog.daum.net/_blog/BlogTypeView.do?blogid=0qN5Q&articleno"
 articleUrl = "http://blog.daum.net/_blog/hdn/ArticleContentsView.do?blogid=0qN5Q&articleno"
@@ -18,27 +20,16 @@ codeRegex = re.compile('[0-9]*')
 def writeLog(msg):
 	with open("%s/%s"%(path,logfile),'a',encoding="utf-8-sig") as a:
 		a.write(msg)
-
-def replaceSpecialCh(title):
-	res = title.replace('\\','＼')
-	res = res.replace('/','／')
-	res = res.replace(':','：')
-	res = res.replace('*','＊')
-	res = res.replace('?','？')
-	res = res.replace('\"','＂')
-	res = res.replace('<','〈')
-	res = res.replace('>','〉')
-	res = res.replace('|','｜')
-	res = res.replace('.','．')
-	res = res.replace('#','＃')
-	return res
-
+		
 def sniperriflesr(codeList):
 	for code in codeList:
 		print("%d start" %(code))
 		response = requests.get("%s=%d" %(url,code))
 		soup = BeautifulSoup(response.content,'html.parser')
-		
+
+		notes = soup.find_all(text=lambda text:isinstance(text,bs4.element.Comment))
+		for note in notes: note.extract()
+
 		main = soup.find('div',class_='articlePrint')
 		if main is None:
 			writeLog("%d does not exist\n" %(code))
@@ -95,44 +86,51 @@ def sniperriflesr(codeList):
 		f.write("<div class=\"date\">%s</div><br/>\n" %(date))
 
 		article = articleSoup.find('div',id='contentDiv')
-		p = article.find_all('p')
+		for link in article.find_all("link"): link.extract()
+		for style in article.find_all("style"): style.extract()
+		p = article.find_all("img")
 		f.write("<div class=\"article\">\n")
 		
-		num = 1
-		for i in p:
-			if i.find('img') is not None and i.find('img').has_attr('data-filename'):
-				imgSrc = i.find('img')['src'].replace("image","original")
-				fileExt = i.find('img')['data-filename'].split('.')[-1]
-				fileName = "%03d.%s" %(num,fileExt)
-				
-				try:
-					imgBuf = urllib.request.urlopen(imgSrc)
-				except:
-					writeLog("%d_%s/%s open fail\n" %(code,titleWin,fileName))
-					continue
-
-				try:
-					imgBuf = imgBuf.read()
-				except:
-					writeLog("%d_%s/%s reading fail\n" %(code,titleWin,fileName))
-					continue
-
-				try:
-					imgFile = open("%s_%s/%s" %(doc,titleWin,fileName),"wb")
-				except:
-					writeLog("Making %d_%s/%s fail\n" %(code,titleWin,fileName))
-					continue
-				else:
-					imgFile.write(imgBuf)
-				finally:
-					imgFile.close()
-				
-				pos1 = str(i).find("<img")
-				pos2 = str(i).find(">",pos1)
-				f.write("\t"+str(i)[:pos1].replace("<p>","<p style=\"TEXT-ALIGN: center\">")+"<img src=\"%d_%s/%s\">" %(code,titleWin,fileName)+str(i)[pos2+1:]+"\n")
-				num+=1
+		i=0
+		while(i < len(p)):
+			if p[i].has_attr('data-filename'):
+				fileExt = p[i]["data-filename"].split('.')[-1]
 			else:
-				f.write("\t"+str(i).replace("<p>","<p style=\"TEXT-ALIGN: center\">")+"\n")
+				fileExt = "jpg"
+			imgSrc = p[i]["src"].replace("image","original")
+			fileName = "%03d.%s" %(i+1,fileExt)
+				
+			try:
+				imgBuf = urllib.request.urlopen(imgSrc)
+			except:
+				writeLog("%d_%s/%s open fail\n" %(code,titleWin,fileName))
+				continue
+
+			try:
+				imgBuf = imgBuf.read()
+			except:
+				writeLog("%d_%s/%s reading fail\n" %(code,titleWin,fileName))
+				continue
+
+			try:
+				imgFile = open("%s_%s/%s" %(doc,titleWin,fileName),"wb")
+			except:
+				writeLog("Making %d_%s/%s fail\n" %(code,titleWin,fileName))
+				continue
+			else:
+				imgFile.write(imgBuf)
+			finally:
+				imgFile.close()
+				
+			p[i].attrs["src"] = "%d_%s/%s" %(code,titleWin,fileName)
+			for attr in list(p[i].attrs):
+				if attr != "src":
+					del p[i][attr]
+			i+=1
+		for t in article.find_all("p"):
+			for attr in list(t.attrs):
+				del t[attr]
+		f.write(str(article))
 		f.write("</div><br/>\n")
 		
 		f.write("<div class=\"another\">\n")
@@ -223,6 +221,10 @@ def sniperriflesr(codeList):
 						j.find('li',class_="sDateTime").name = 'div'
 					if j.find('li',class_="opinionBtn") is not None:
 						j.find('li',class_="opinionBtn").decompose()
+
+		for i in comment.find_all("input",type="hidden"):
+			i.decompose()
+		comment["class"] = "comment"
 		f.write(str(comment))
 		
 		f.write(html_footer)

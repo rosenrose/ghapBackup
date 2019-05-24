@@ -5,7 +5,6 @@ import time
 import sys
 sys.path.append("C:/users/crazy/pictures/python")
 import bs4
-import subprocess
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -13,11 +12,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from replaceSpecialCh import replaceSpecialCh
 
-url = "https://touhoustory.tistory.com"
-path = "D:/Touhou/doujin/touhoustory"
+url = "https://rumia0528.tistory.com"
+path = "D:/Touhou/doujin/rumia0528"
 logfile = "log.log"
 html_footer = "\n</body>\n</html>"
-catRegex = re.compile('(동방 동인지|합동인지|동방 웹코믹|세로 식질 유배소)')
+catRegex = re.compile('(동방 동인지)')
 codeRegex = re.compile('[0-9]*')
 
 #options = webdriver.ChromeOptions()
@@ -30,8 +29,8 @@ wait = WebDriverWait(driver,5)
 def writeLog(msg):
 	with open("%s/%s"%(path, logfile), 'a', encoding="utf-8-sig") as a:
 		a.write(msg)
-		
-def touhoustory(codeList):
+
+def rumia0528(codeList):
 	for code in codeList:
 		print("%d start" %(code))
 		driver.get("%s/%d" %(url, code))
@@ -46,6 +45,9 @@ def touhoustory(codeList):
 			continue
 		
 		category = tdiv.find("div",class_="ect").find("a").text
+		if not (catRegex.match(category)):
+			writeLog("%d out of category (%s)\n" %(code, category))
+			continue
 
 		try:
 			element = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"imageblock")))
@@ -54,6 +56,11 @@ def touhoustory(codeList):
 			continue
 
 		title = tdiv.find("h2").find("a").text
+		left = title.find('[')
+		right = title.find(']')
+		if right != -1 and left == 0:
+			title = title[right+1:].strip()
+
 		date = tdiv.find_all("span")[1].text
 
 		titleWin = replaceSpecialCh(title)
@@ -78,8 +85,17 @@ def touhoustory(codeList):
 		f.write("<div class=\"date\">%s</div><br/>\n" %(date))
 		
 		article = soup.find("div",class_="article")
+		fold = article.find_all("p",class_=re.compile("moreless_*"))
+		if fold is not None:
+			for i in fold:
+				i.decompose()
+		fold = article.find_all("div",class_=re.compile("moreless_*"))
+		if fold is not None:
+			for i in fold:
+				i.unwrap()
 		article.find("div",class_="container_postbtn").decompose()
-		another = article.find("div",class_="another_category another_category_color_blue").extract()
+		article.find("div",class_="tt-plugin tt-share-entry-with-sns tt-sns-icon-alignment-center tt-sns-icon-size-big").decompose()
+		another = article.find("div",class_="another_category another_category_color_gray").extract()
 
 		p = article.find_all("img")
 		f.write("<div class=\"article\">\n")
@@ -94,7 +110,8 @@ def touhoustory(codeList):
 					fileExt = "png"
 			else:
 				fileExt = "jpg"
-			imgSrc = p[i]["src"]+"?original"
+
+			imgSrc = p[i]["src"]+"?original"				
 			fileName = "%03d.%s" %(i+1,fileExt)
 				
 			try:
@@ -177,12 +194,15 @@ def touhoustory(codeList):
 		print("%d end" %(code))
 		time.sleep(3)
 
+argStr = ""
 for i in range(1,len(sys.argv)):
 	if sys.argv[i].find('-') == -1:
-		touhoustory([int(sys.argv[i])])
+		rumia0528([int(sys.argv[i])])
 	else:
 		c1 = sys.argv[i].split('-')[0]
 		c2 = sys.argv[i].split('-')[1]
-		touhoustory(range(int(c1),int(c2)+1))
+		rumia0528(range(int(c1),int(c2)+1))
+	argStr = argStr + sys.argv[i] + " "
 driver.quit()
-subprocess.run(["python","htmlToGit.py","touhoustory","add"]+sys.argv[1:],encoding="utf-8",cwd="c:/users/crazy/pictures/python")
+os.chdir("c:/users/crazy/pictures/python")
+os.system("python htmlToGit.py rumia0528 "+argStr.strip())
